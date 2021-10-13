@@ -1,7 +1,8 @@
 import pygame
+from pygame.locals import *
+
 from board import Board
 
-from map import Map
 pygame.init()
 
 size = width, height = 720, 480
@@ -26,6 +27,7 @@ class Game:
     def update(self):
         if self.started:
             self.board.draw(screen)
+            self.board.snake.update()
 
 
 
@@ -36,8 +38,15 @@ while lauched:
     
     for event in pygame.event.get():
         if event.type == pygame.QUIT: lauched = False
-        if event.type == pygame.KEYDOWN: game.start()
+
+        keys = pygame.key.get_pressed()
+        if keys[K_SPACE]: game.start()
+        if keys[K_UP]: game.board.snake.up()
+        if keys[K_DOWN]: game.board.snake.down()
+        if keys[K_RIGHT]: game.board.snake.right()
+        if keys[K_LEFT]: game.board.snake.left()
     
+    screen.fill((0, 0, 0))
     game.update()
     pygame.display.flip()
     clock.tick(60)

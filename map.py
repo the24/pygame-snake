@@ -30,10 +30,3 @@ class Map:
                 y = j * tile.height + self.map_posy
                 
                 pygame.draw.rect(screen, tile.color, pygame.Rect(x, y, tile.width, tile.height))
-
-    def draw_object(self, screen, pos):
-        posx = pos[0] * Tile.TILE_WIDTH + self.map_posx
-        posy = pos[1] * Tile.TILE_HEIGHT + self.map_posy
-
-        pygame.draw.rect(screen, (200, 76, 76), pygame.Rect(posx, posy, Tile.TILE_WIDTH, Tile.TILE_HEIGHT))
-
