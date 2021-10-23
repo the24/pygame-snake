@@ -14,7 +14,7 @@ class Object:
         pygame.draw.rect(screen, self.color, self.rect)
 
 
-class Mouvable(Object):
+class Movable(Object):
 
     def __init__(self, x: int, y: int, width: int, height: int, color: Tuple[int] = (0, 0, 0)) -> None:
         super().__init__(x, y, width, height, color=color)
