@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 
 from board import Board
+from snake import Snake
 
 pygame.init()
 
@@ -27,7 +28,10 @@ class Game:
     def update(self):
         if self.started:
             self.board.draw(screen)
-            self.board.snake.update()
+            self.snake().update()
+    
+    def snake(self) -> Snake:
+        return self.board.map.snake
 
 
 
@@ -41,10 +45,10 @@ while lauched:
 
         keys = pygame.key.get_pressed()
         if keys[K_SPACE]: game.start()
-        if keys[K_UP]: game.board.snake.up()
-        if keys[K_DOWN]: game.board.snake.down()
-        if keys[K_RIGHT]: game.board.snake.right()
-        if keys[K_LEFT]: game.board.snake.left()
+        if keys[K_UP]: game.snake().up()
+        if keys[K_DOWN]: game.snake().down()
+        if keys[K_RIGHT]: game.snake().right()
+        if keys[K_LEFT]: game.snake().left()
     
     screen.fill((0, 0, 0))
     game.update()
