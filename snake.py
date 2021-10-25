@@ -1,8 +1,8 @@
 from typing import Tuple
-from object import Mouvable
+from object import Movable
 
 
-class Snake(Mouvable):
+class Snake(Movable):
 
     def __init__(self, x: int = 3, y: int = 4, color: Tuple[int] = (30, 50, 170)) -> None:
         super().__init__(x, y, 24, 24, color=color)
