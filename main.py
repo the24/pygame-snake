@@ -17,7 +17,6 @@ class Game:
         self.board = Board()
         self.started = False
         self.board.center(screen)
-        
 
     def start(self):
         self.started = True
@@ -31,7 +30,7 @@ class Game:
             self.snake().update()
     
     def snake(self) -> Snake:
-        return self.board.map.snake
+        return self.board.snake
 
 
 

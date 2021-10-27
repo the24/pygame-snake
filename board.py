@@ -2,6 +2,7 @@ import pygame
 from game_colors import Color
 from map import Map, Tile
 from menu import Menu
+from snake import Snake
 
 class Board(Menu):
 
@@ -10,6 +11,8 @@ class Board(Menu):
         super().__init__((self.map.width + 2) * Tile.TILE_WIDTH, (self.map.height + 3) * Tile.TILE_HEIGHT, x, y)
         
         self.append_child(self.map)
+        self.snake = Snake(self.map)
+        self.map._objects.append(self.snake)
 
 
     def draw(self, screen: pygame.Surface):

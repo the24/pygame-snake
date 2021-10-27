@@ -27,8 +27,7 @@ class Menu:
         self.y = y
 
         for child in self._childs:
-            child.x += delta_x
-            child.y += delta_y
+            child.move(child.x + delta_x, child.y + delta_y)
         
         for obj in self._objects:
             obj.rect.x += delta_x
