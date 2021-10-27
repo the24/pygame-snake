@@ -1,8 +1,8 @@
+from typing import Tuple
 import pygame
 
 from game_colors import Color
 from menu import Menu
-from snake import Snake
 
 class Tile:
     TILE_WIDTH: int = 36
@@ -14,12 +14,21 @@ class Tile:
 
 
 class Map(Menu):
-    snake = Snake()
 
     def __init__(self, width: int, height: int, x: int = 0, y: int = 0) -> None:
         super().__init__(width, height, x, y)
-        self._objects.append(self.snake)
     
+    def get_pos(self, x: int, y: int) -> Tuple[int, int]:
+        return self.x + x * Tile.TILE_WIDTH, self.y + y * Tile.TILE_HEIGHT
+
+    def get_case(self, x: int, y: int) -> Tuple[int, int] | int:
+        x = (x - self.x) // Tile.TILE_WIDTH
+        y = (y - self.y) // Tile.TILE_HEIGHT
+        if 0 <= x < self.width and 0 <= y < self.height:
+            return x, y
+        else:
+            return -1
+
     def draw(self, screen):
         for i in range(self.width):
             for j in range(self.height):
