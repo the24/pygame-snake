@@ -2,6 +2,7 @@ from typing import List, Tuple
 
 import pygame
 from pygame.rect import Rect
+from game_colors import Color
 from map import Map
 from object import Movable
 
@@ -15,7 +16,7 @@ class Snake(Movable):
         self.dir = [0, 0]
         self.speed = 10
         self.tail: List[Rect] = []
-        self.tail_lenght = 0
+        self.tail_lenght = len(self.tail)
     
     def update(self):
         if self.dir == [0, 0]:
@@ -33,7 +34,7 @@ class Snake(Movable):
             for i in range(len(self.tail) - 1):
                 self.tail[i] = self.tail[i + 1]
             
-            self.tail[self.tail_lenght - 1] = pygame.Rect(self.prev_x, self.prev_y, 36, 36)
+            #self.tail[self.tail_lenght - 1] = pygame.Rect(self.prev_x, self.prev_y, 36, 36)
         else:
             delta_x = self.x - self.prev_x
             delta_y = self.y - self.prev_y
@@ -41,8 +42,43 @@ class Snake(Movable):
             self.rect.x += round(delta_x / 60 * self.speed)
             self.rect.y += round(delta_y / 60 * self.speed)
     
+    def _draw_head(self, screen: pygame.Surface, x, y, w, h):
+        snake_surface = pygame.Surface((w, h)).convert_alpha()
+        snake_surface.fill((0, 0, 0, 0))
+        
+        # Nose
+        r = 1/3*w
+        pygame.draw.ellipse(snake_surface, self.color, (1/3*w, 0.1*h, 2/3*w, 0.8*h))
+
+        # Body
+        pygame.draw.rect(snake_surface, self.color, (0, 0.1*h, 2/3*w, 0.8*h))
+
+        # Eye
+        r = 1/4*w
+        pygame.draw.circle(snake_surface, self.color, (1/3*w, r), r)
+        pygame.draw.circle(snake_surface, self.color, (1/3*w, h - r), r)
+
+        r = 1/7*w
+        pygame.draw.circle(snake_surface, Color.EYES, (1/3*w, r), r)
+        pygame.draw.circle(snake_surface, Color.EYES, (1/3*w, h - r), r)
+        
+        pygame.draw.circle(snake_surface, self.color, (7/18*w, r), 2/3*r)
+        pygame.draw.circle(snake_surface, self.color, (7/18*w, h - r), 2/3*r)
+
+        if self.dir == [0, 1]:
+            snake_surface = pygame.transform.rotate(snake_surface, 270)
+        elif self.dir == [-1, 0]:
+            snake_surface = pygame.transform.rotate(snake_surface, 180)
+        elif self.dir == [0, -1]:
+            snake_surface = pygame.transform.rotate(snake_surface, 90)
+        
+        pygame.Surface.blit(screen, snake_surface, (x, y))
+
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect)
+        x, y = self.rect.x, self.rect.y
+        w, h = self.rect.width, self.rect.height
+        
+        self._draw_head(screen, x, y, w, h)
 
         for t in self.tail:
             pygame.draw.rect(screen, self.color, t)
