@@ -154,7 +154,12 @@ class Snake(Movable):
         pygame.Surface.blit(screen, draw_surface, (x, y))
     
     def _draw_end_tail(self, screen: pygame.Surface, x: int, y: int, size: int, t_before: Tuple[int, int]):
-        draw_surface = pygame.Surface((size, size)).convert_alpha()
+        if hasattr(self, "prev_x") and hasattr(self, "prev_y"):
+            delta = max(abs(self.prev_x - self.rect.centerx), abs(self.prev_y - self.rect.centery))
+        else:
+            delta = 0
+
+        draw_surface = pygame.Surface((size - delta, size)).convert_alpha()
         draw_surface.fill((0, 0, 0, 0))
 
         snake_width = ceil(0.8*size)
@@ -166,18 +171,24 @@ class Snake(Movable):
         pygame.draw.rect(draw_surface, self.color, (center, margin, center, snake_width))
         
         case_x, case_y = self.map.get_case(x, y)
-        if case_x == t_before[0] and case_y == t_before[1] + 1:
+        if case_x == t_before[0] - 1 and case_y == t_before[1]:
+            pygame.Surface.blit(screen, draw_surface, (x + delta, y))
+        elif case_x == t_before[0] and case_y == t_before[1] + 1:
             draw_surface = pygame.transform.rotate(draw_surface, 90)
+
+            pygame.Surface.blit(screen, draw_surface, (x, y))
         elif case_x == t_before[0] and case_y == t_before[1] - 1:
             draw_surface = pygame.transform.rotate(draw_surface, 270)
             # Because it's not totally symmetrical on small screens
             draw_surface = pygame.transform.flip(draw_surface, True, False)
+
+            pygame.Surface.blit(screen, draw_surface, (x, y + delta))
         elif case_x == t_before[0] + 1 and case_y == t_before[1]:
             draw_surface = pygame.transform.rotate(draw_surface, 180)
             # Because it's not totally symmetrical on small screens
             draw_surface = pygame.transform.flip(draw_surface, False, True)
 
-        pygame.Surface.blit(screen, draw_surface, (x, y))
+            pygame.Surface.blit(screen, draw_surface, (x, y))
 
     def draw(self, screen):
         head_x, head_y = self.rect.x, self.rect.y
