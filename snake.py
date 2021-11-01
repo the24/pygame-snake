@@ -1,15 +1,16 @@
 from typing import List, Tuple
 
 import pygame
+
 from game_colors import Color
-from map import Map, Tile
+from map import Map
 from object import Movable
 
 
 class Snake(Movable):
 
     def __init__(self, map: Map, x: int = 3, y: int = 4, color: Tuple[int] = (30, 50, 170)) -> None:
-        x, y = map.get_pos(x, y)
+        x, y = map.get_pos(x, y).topleft
         super().__init__(x, y, 36, 36, color=color)
         self.map = map
 
@@ -18,7 +19,7 @@ class Snake(Movable):
 
         x, y = map.get_case(x, y)
         self.tail: List[Tuple[int, int]] = []
-        for i in range(1, 4):
+        for i in range(3, 0, -1):
             self.tail.append((x - i, y))
         self.tail_lenght = len(self.tail)
     
@@ -32,8 +33,8 @@ class Snake(Movable):
         if self.rect.center == (self.x, self.y):
             self.prev_x, self.prev_y = self.x, self.y
 
-            self.x += self.dir[0] * Tile.TILE_WIDTH
-            self.y += self.dir[1] * Tile.TILE_HEIGHT
+            self.x += self.dir[0] * self.map.tile_size
+            self.y += self.dir[1] * self.map.tile_size
 
             for i in range(len(self.tail) - 1):
                 self.tail[i] = self.tail[i + 1]
@@ -167,7 +168,7 @@ class Snake(Movable):
 
         for i in range(self.tail_lenght):
             t = self.tail[i]
-            x, y = self.map.get_pos(t[0], t[1])
+            x, y = self.map.get_pos(t[0], t[1]).topleft
             if i == 0:
                 self._draw_end_tail(screen, x, y, w, h, self.tail[1])
             elif i == self.tail_lenght - 1:
