@@ -1,3 +1,4 @@
+from math import ceil, floor
 from typing import List, Tuple
 
 import pygame
@@ -15,7 +16,7 @@ class Snake(Movable):
         self.map = map
 
         self.dir = [0, 0]
-        self.speed = 10
+        self.speed = 1
 
         x, y = map.get_case(x, y)
         self.tail: List[Tuple[int, int]] = []
@@ -71,28 +72,31 @@ class Snake(Movable):
         else:
             return -1
 
-    def _draw_head(self, screen: pygame.Surface, x, y, w, h):
-        snake_surface = pygame.Surface((w, h)).convert_alpha()
+    def _draw_head(self, screen: pygame.Surface, x, y, size):
+        snake_surface = pygame.Surface((size, size)).convert_alpha()
         snake_surface.fill((0, 0, 0, 0))
         
+        snake_width = ceil(0.8*size)
+        margin = floor(0.1*size)
+        one_third = round(1/3*size)
+
         # Nose
-        r = 1/3*w
-        pygame.draw.ellipse(snake_surface, self.color, (1/3*w, 0.1*h, 2/3*w, 0.8*h))
+        pygame.draw.ellipse(snake_surface, self.color, (one_third, margin, 2*one_third, snake_width))
 
         # Body
-        pygame.draw.rect(snake_surface, self.color, (0, 0.1*h, 2/3*w, 0.8*h))
+        pygame.draw.rect(snake_surface, self.color, (0, margin, 2*one_third, snake_width))
 
         # Eye
-        r = 1/4*w
-        pygame.draw.circle(snake_surface, self.color, (1/3*w, r), r)
-        pygame.draw.circle(snake_surface, self.color, (1/3*w, h - r), r)
+        r = round(1/4*size)
+        pygame.draw.circle(snake_surface, self.color, (one_third, r), r)
+        pygame.draw.circle(snake_surface, self.color, (one_third, size - r), r)
 
-        r = 1/7*w
-        pygame.draw.circle(snake_surface, Color.EYES, (1/3*w, r), r)
-        pygame.draw.circle(snake_surface, Color.EYES, (1/3*w, h - r), r)
+        r = round(1/7*size)
+        pygame.draw.circle(snake_surface, Color.EYES, (one_third, r), r)
+        pygame.draw.circle(snake_surface, Color.EYES, (one_third, size - r), r)
         
-        pygame.draw.circle(snake_surface, self.color, (7/18*w, r), 2/3*r)
-        pygame.draw.circle(snake_surface, self.color, (7/18*w, h - r), 2/3*r)
+        pygame.draw.circle(snake_surface, self.color, (7/18*size, r), 2/3*r)
+        pygame.draw.circle(snake_surface, self.color, (7/18*size, size - r), 2/3*r)
 
         if self.dir == [0, 1]:
             snake_surface = pygame.transform.rotate(snake_surface, 270)
@@ -107,82 +111,100 @@ class Snake(Movable):
         
         pygame.Surface.blit(screen, snake_surface, (x, y))
 
-    def _draw_neck(self, screen: pygame.Surface, x, y, w, h, head_x, head_y):
+    def _draw_neck(self, screen: pygame.Surface, x: int, y: int, size: int, head_x: int, head_y: int):
         # TODO: Handle when the neck is a corner
+
         lenght_x = abs(x - head_x)
         lenght_y = abs(y - head_y)
 
-        if self.dir == [1, 0]:
-            pygame.draw.rect(screen, self.color, (x, y + 0.1*h, lenght_x, 0.8*h))
-        elif self.dir == [-1, 0]:
-            pygame.draw.rect(screen, self.color, (self.rect.topright[0], y + 0.1*h, lenght_x, 0.8*h))
-        elif self.dir == [0, 1]:
-            pygame.draw.rect(screen, self.color, (x + 0.1*w, y, 0.8*w, lenght_y))
-        elif self.dir == [0, -1]:
-            pygame.draw.rect(screen, self.color, (x + 0.1*w, self.rect.bottomleft[1], 0.8*w, lenght_y))
+        snake_width = ceil(0.8*size)
+        margin = floor(0.1*size)
 
-    def _draw_corner(self, screen: pygame.Surface, x: int, y: int, w: int, h: int, t_before: Tuple[int, int], t_after: Tuple[int, int]):
+        if self.dir == [1, 0]:
+            pygame.draw.rect(screen, self.color, (x, y + margin, lenght_x, snake_width))
+        elif self.dir == [-1, 0]:
+            pygame.draw.rect(screen, self.color, (self.rect.topright[0], y + margin, lenght_x, snake_width))
+        elif self.dir == [0, 1]:
+            pygame.draw.rect(screen, self.color, (x + margin, y, snake_width, lenght_y))
+        elif self.dir == [0, -1]:
+            pygame.draw.rect(screen, self.color, (x + margin, self.rect.bottomleft[1], snake_width, lenght_y))
+
+    def _draw_corner(self, screen: pygame.Surface, x: int, y: int, size: int, t_before: Tuple[int, int], t_after: Tuple[int, int]):
         o = self.get_corner_orientation(t_before, self.map.get_case(x, y), t_after)
-        draw_surface = pygame.Surface((w, h)).convert_alpha()
+        draw_surface = pygame.Surface((size, size)).convert_alpha()
         transparent = (0, 0, 0, 0)
         draw_surface.fill(transparent)
 
+        snake_width = ceil(0.8*size)
+        margin = floor(0.1*size)
+
         if o == (1, 1):
-            pygame.draw.circle(draw_surface, self.color, (w, h), 0.8*w)
-            pygame.draw.circle(draw_surface, transparent, (w, h), 0.1*w)
+            pygame.draw.circle(draw_surface, self.color, (size, size), snake_width + margin)
+            pygame.draw.circle(draw_surface, transparent, (size, size), margin)
         if o == (1, -1):
-            pygame.draw.circle(draw_surface, self.color, (w, 0), 0.8*w)
-            pygame.draw.circle(draw_surface, transparent, (w, 0), 0.1*w)
+            pygame.draw.circle(draw_surface, self.color, (size, 0), snake_width + margin)
+            pygame.draw.circle(draw_surface, transparent, (size, 0), margin)
         elif o == (-1, -1):
-            pygame.draw.circle(draw_surface, self.color, (0, 0), 0.8*w)
-            pygame.draw.circle(draw_surface, transparent, (0, 0), 0.1*w)
+            pygame.draw.circle(draw_surface, self.color, (0, 0), snake_width + margin)
+            pygame.draw.circle(draw_surface, transparent, (0, 0), margin)
         elif o == (-1, 1):
-            pygame.draw.circle(draw_surface, self.color, (0, h), 0.8*w)
-            pygame.draw.circle(draw_surface, transparent, (0, h), 0.1*w)
+            pygame.draw.circle(draw_surface, self.color, (0, size), snake_width + margin)
+            pygame.draw.circle(draw_surface, transparent, (0, size), margin)
         
         pygame.Surface.blit(screen, draw_surface, (x, y))
     
-    def _draw_end_tail(self, screen: pygame.Surface, x: int, y: int, w, h, t_before: Tuple[int, int]):
-        draw_surface = pygame.Surface((w, h)).convert_alpha()
+    def _draw_end_tail(self, screen: pygame.Surface, x: int, y: int, size: int, t_before: Tuple[int, int]):
+        draw_surface = pygame.Surface((size, size)).convert_alpha()
         draw_surface.fill((0, 0, 0, 0))
 
-        r = round((w/2)*0.8)
-        pygame.draw.circle(draw_surface, self.color, (w/2, h/2), r)
-        pygame.draw.rect(draw_surface, self.color, (w/2, 0.1*h, w/2, 0.8*h))
+        snake_width = ceil(0.8*size)
+        margin = floor(0.1*size)
+        r = round(snake_width/2)
+        center = round(size/2)
+
+        pygame.draw.circle(draw_surface, self.color, (center, center), r)
+        pygame.draw.rect(draw_surface, self.color, (center, margin, center, snake_width))
         
         case_x, case_y = self.map.get_case(x, y)
         if case_x == t_before[0] and case_y == t_before[1] + 1:
             draw_surface = pygame.transform.rotate(draw_surface, 90)
         elif case_x == t_before[0] and case_y == t_before[1] - 1:
             draw_surface = pygame.transform.rotate(draw_surface, 270)
+            # Because it's not totally symmetrical on small screens
+            draw_surface = pygame.transform.flip(draw_surface, True, False)
         elif case_x == t_before[0] + 1 and case_y == t_before[1]:
             draw_surface = pygame.transform.rotate(draw_surface, 180)
+            # Because it's not totally symmetrical on small screens
+            draw_surface = pygame.transform.flip(draw_surface, False, True)
 
         pygame.Surface.blit(screen, draw_surface, (x, y))
 
     def draw(self, screen):
         head_x, head_y = self.rect.x, self.rect.y
-        w, h = self.rect.width, self.rect.height
+        size = self.rect.width
         
-        self._draw_head(screen, head_x, head_y, w, h)
+        self._draw_head(screen, head_x, head_y, size)
 
         for i in range(self.tail_lenght):
             t = self.tail[i]
             x, y = self.map.get_pos(t[0], t[1]).topleft
             if i == 0:
-                self._draw_end_tail(screen, x, y, w, h, self.tail[1])
+                self._draw_end_tail(screen, x, y, size, self.tail[1])
             elif i == self.tail_lenght - 1:
-                self._draw_neck(screen, x, y, w, h, head_x, head_y)
+                self._draw_neck(screen, x, y, size, head_x, head_y)
             else:
                 t_before = self.tail[i-1]
                 t_after = self.tail[i+1]
                 
+                snake_width = ceil(0.8*size)
+                margin = floor(0.1*size)
+
                 if t_before[0] == t[0] == t_after[0]:
-                    pygame.draw.rect(screen, self.color, (x + 0.1*w, y, 0.8*w, h))
+                    pygame.draw.rect(screen, self.color, (x + margin, y, snake_width, size))
                 elif t_before[1] == t[1] == t_after[1]:
-                    pygame.draw.rect(screen, self.color, (x, y + 0.1*h, w, 0.8*h))
+                    pygame.draw.rect(screen, self.color, (x, y + margin, size, snake_width))
                 else:
-                    self._draw_corner(screen, x, y, w, h, t_before, t_after)
+                    self._draw_corner(screen, x, y, size, t_before, t_after)
 
     def down(self):
         self.dir = [0, 1]
