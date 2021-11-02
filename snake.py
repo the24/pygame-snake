@@ -16,7 +16,7 @@ class Snake(Movable):
         self.map = map
 
         self.dir = [0, 0]
-        self.speed = 1
+        self.speed = 5
 
         x, y = map.get_case(x, y)
         self.tail: List[Tuple[int, int]] = []
@@ -128,6 +128,8 @@ class Snake(Movable):
             pygame.draw.rect(screen, self.color, (x + margin, y, snake_width, lenght_y))
         elif self.dir == [0, -1]:
             pygame.draw.rect(screen, self.color, (x + margin, self.rect.bottomleft[1], snake_width, lenght_y))
+        else:
+            pygame.draw.rect(screen, self.color, (x, y + margin, size, snake_width))
 
     def _draw_corner(self, screen: pygame.Surface, x: int, y: int, size: int, t_before: Tuple[int, int], t_after: Tuple[int, int]):
         o = self.get_corner_orientation(t_before, self.map.get_case(x, y), t_after)
@@ -157,9 +159,13 @@ class Snake(Movable):
         if hasattr(self, "prev_x") and hasattr(self, "prev_y"):
             delta = max(abs(self.prev_x - self.rect.centerx), abs(self.prev_y - self.rect.centery))
         else:
-            delta = 0
+            delta = size / 2
 
-        draw_surface = pygame.Surface((size - delta, size)).convert_alpha()
+        if self.dir == [0, 0]:
+            lenght = size
+        else:
+            lenght = (3/2)*size
+        draw_surface = pygame.Surface((lenght - delta, size)).convert_alpha()
         draw_surface.fill((0, 0, 0, 0))
 
         snake_width = ceil(0.8*size)
@@ -168,11 +174,12 @@ class Snake(Movable):
         center = round(size/2)
 
         pygame.draw.circle(draw_surface, self.color, (center, center), r)
-        pygame.draw.rect(draw_surface, self.color, (center, margin, center, snake_width))
+        pygame.draw.rect(draw_surface, self.color, (center, margin, lenght, snake_width))
         
         case_x, case_y = self.map.get_case(x, y)
+        offset = lenght - size
         if case_x == t_before[0] - 1 and case_y == t_before[1]:
-            pygame.Surface.blit(screen, draw_surface, (x + delta, y))
+            pygame.Surface.blit(screen, draw_surface, (x - offset + delta, y))
         elif case_x == t_before[0] and case_y == t_before[1] + 1:
             draw_surface = pygame.transform.rotate(draw_surface, 90)
 
@@ -182,7 +189,7 @@ class Snake(Movable):
             # Because it's not totally symmetrical on small screens
             draw_surface = pygame.transform.flip(draw_surface, True, False)
 
-            pygame.Surface.blit(screen, draw_surface, (x, y + delta))
+            pygame.Surface.blit(screen, draw_surface, (x, y - offset + delta))
         elif case_x == t_before[0] + 1 and case_y == t_before[1]:
             draw_surface = pygame.transform.rotate(draw_surface, 180)
             # Because it's not totally symmetrical on small screens
