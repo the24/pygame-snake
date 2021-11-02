@@ -1,5 +1,6 @@
 import pygame
 
+from food import Apple
 from game_colors import Color
 from map import Map
 from menu import Menu
@@ -15,8 +16,17 @@ class Board(Menu):
         
         self.append_child(self.map)
         self.snake = Snake(self.map)
+        self.apple = Apple(self.map)
         self.map._objects.append(self.snake)
+        self.map._objects.append(self.apple)
 
+
+    def update(self):
+        if self.snake.rect.collidepoint(self.apple.rect.center):
+            self.snake.eat()
+            self.apple.gen_new_apple(self.snake)
+        
+        self.snake.update()
 
     def draw(self, screen: pygame.Surface):
         color = Color.DARK_GREEN

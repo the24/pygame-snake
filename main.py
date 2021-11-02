@@ -27,7 +27,7 @@ class Game:
     def update(self):
         if self.started:
             self.board.draw(screen)
-            self.snake().update()
+            self.board.update()
     
     def snake(self) -> Snake:
         return self.board.snake

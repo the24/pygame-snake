@@ -39,6 +39,8 @@ class Snake(Movable):
 
             for i in range(len(self.tail) - 1):
                 self.tail[i] = self.tail[i + 1]
+            # for i in range(1, len(self.tail)):
+            #     self.tail[i] = self.tail[i - 1]
             
             self.tail[self.tail_lenght - 1] = self.map.get_case(self.rect.x, self.rect.y)
         else:
@@ -49,6 +51,10 @@ class Snake(Movable):
             my = round(delta_y / 60 * self.speed)
             self.rect.x += mx
             self.rect.y += my
+    
+    def eat(self):
+        self.tail.insert(0, self.tail[0])
+        self.tail_lenght += 1
     
     def get_corner_orientation(self, p0: Tuple[int, int], p1: Tuple[int, int], p2:Tuple[int, int]) -> Tuple[int, int] | int:
         top_left = (-1, -1)
