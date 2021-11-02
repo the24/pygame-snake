@@ -44,10 +44,10 @@ while lauched:
 
         keys = pygame.key.get_pressed()
         if keys[K_SPACE]: game.start()
-        if keys[K_UP]: game.snake().up()
-        if keys[K_DOWN]: game.snake().down()
-        if keys[K_RIGHT]: game.snake().right()
-        if keys[K_LEFT]: game.snake().left()
+        if keys[K_UP] and not game.snake().dir == [0, 1]: game.snake().up()
+        if keys[K_DOWN] and not game.snake().dir == [0, -1]: game.snake().down()
+        if keys[K_RIGHT] and not game.snake().dir == [-1, 0]: game.snake().right()
+        if keys[K_LEFT] and not game.snake().dir == [1, 0]: game.snake().left()
     
     screen.fill((0, 0, 0))
     game.update()
