@@ -10,6 +10,9 @@ _ColorValue = Union[
     str, Tuple[int, int, int], List[int], int, Tuple[int, int, int, int]
 ]
 
+# The font used in the Label.
+# Must be initialized before being used (`init_font`).
+_GameFont: pygame.font.Font = None
 
 class Color():
     BLUE = (41, 128, 185)
@@ -50,6 +53,22 @@ class Menu:
             obj.rect.y += delta_y
 
 
+class Label:
+
+    def __init__(self, text: str, color: _ColorValue, rect: pygame.Rect) -> None:
+        self.text = text
+        self.color = color
+        self.rect = rect
+    
+    def set_text(self, text: str):
+        self.text = text
+
+    def draw(self, screen: pygame.Surface):
+        text = _GameFont.render(self.text, True, self.color)
+        x = self.rect.x
+        y = self.rect.centery - text.get_size()[1]/2
+        screen.blit(text, (x, y))
+
 @dataclass
 class Tile:
     """
@@ -70,15 +89,22 @@ class Board(Menu):
 
     def __init__(self, x: int = 0, y: int = 0) -> None:
         border_size = 36
-        self.map = Map(10, 9, x + border_size, y + border_size * 2)
-        super().__init__(self.map.width + (2 * border_size), self.map.height + (3 * border_size), x, y)
-        
-        self.append_child(self.map)
 
-    def draw(self, screen: pygame.Surface):
+        self.map = Map(10, 9, x + border_size, y + border_size * 2)
+        label_rect = pygame.Rect(x + border_size, y, x + border_size + 50, y + border_size * 2)
+        self.label = Label("0", (255, 255, 255), label_rect)
+
+        super().__init__(self.map.width + (2 * border_size), self.map.height + (3 * border_size), x, y)
+
+        self.append_child(self.map)
+        self._objects.append(self.label)
+
+    def draw(self, screen: pygame.Surface, score: int):
         color = Color.DARK_GREEN
         
         pygame.draw.rect(screen, color, pygame.Rect(self.x, self.y, self.width, self.height))
+        self.label.set_text(str(score))
+        self.label.draw(screen)
         self.map.draw(screen)
 
 
@@ -159,6 +185,10 @@ class Map(Menu):
         for obj in self._objects:
             obj.draw(screen)
 
+
+def init_font(font: str, size: int):
+    global _GameFont
+    _GameFont = pygame.font.SysFont(font, size)
 
 def get_head_surface(size: int, main_color: _ColorValue, angle: int) -> pygame.Surface:
     draw_surface = pygame.Surface((size, size)).convert_alpha()

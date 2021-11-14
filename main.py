@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 
+import gui
 from game import Apple, Snake
 from gui import Board
 
@@ -14,9 +15,11 @@ clock = pygame.time.Clock()
 class Game:
 
     def __init__(self) -> None:
+        gui.init_font("Roboto", 36)
+
         self.board = Board()
-        self.started = False
         self.board.center(screen)
+        self.started = False
 
         self.snake = Snake(self.board.map)
         self.apple = Apple(self.board.map)
@@ -32,7 +35,7 @@ class Game:
 
     def update(self):
         if self.started:
-            self.board.draw(screen)
+            self.board.draw(screen, self.snake.tail_lenght)
         
         if self.snake.rect.collidepoint(self.apple.rect.center):
             self.snake.eat()

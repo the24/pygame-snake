@@ -21,7 +21,7 @@ class Snake(Movable):
         self.map = map
 
         self.dir = [0, 0]
-        self.speed = 1
+        self.speed = 5
 
         x, y = map.get_case(x, y)
         self.tail: List[Tuple[int, int]] = []
