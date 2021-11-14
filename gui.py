@@ -35,6 +35,17 @@ class Menu:
     
     def append_child(self, child) -> None:
         self._childs.append(child)
+    
+    def append_childs(self, *childs) -> None:
+        for child in childs:
+            self.append_child(child)
+    
+    def append_object(self, object: Object) -> None:
+        self._objects.append(object)
+    
+    def append_objects(self, *objects: Object) -> None:
+        for object in objects:
+            self.append_object(object)
 
     def center(self, screen: pygame.Surface) -> None:
         self.move((screen.get_width() - self.width) / 2, (screen.get_height() - self.height) / 2)
@@ -97,7 +108,7 @@ class Board(Menu):
         super().__init__(self.map.width + (2 * border_size), self.map.height + (3 * border_size), x, y)
 
         self.append_child(self.map)
-        self._objects.append(self.label)
+        self.append_object(self.label)
 
     def draw(self, screen: pygame.Surface, score: int):
         color = Color.DARK_GREEN
