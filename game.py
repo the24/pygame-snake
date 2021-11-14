@@ -1,6 +1,6 @@
 from math import ceil, floor
 from random import randint
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import pygame
 
@@ -8,10 +8,14 @@ import gui
 from gui import Map
 from object import Movable, Object
 
+_ColorValue = Union[
+    str, Tuple[int, int, int], List[int], int, Tuple[int, int, int, int]
+]
+
 
 class Snake(Movable):
 
-    def __init__(self, map: Map, x: int = 3, y: int = 4, color: Tuple[int] = (30, 50, 170)) -> None:
+    def __init__(self, map: Map, x: int = 3, y: int = 4, color: _ColorValue = (30, 50, 170)) -> None:
         x, y = map.get_pos(x, y).topleft
         super().__init__(x, y, 36, 36, color=color)
         self.map = map
@@ -40,8 +44,6 @@ class Snake(Movable):
 
             for i in range(len(self.tail) - 1):
                 self.tail[i] = self.tail[i + 1]
-            # for i in range(1, len(self.tail)):
-            #     self.tail[i] = self.tail[i - 1]
             
             self.tail[self.tail_lenght - 1] = self.map.get_case(self.rect.x, self.rect.y)
         else:
@@ -111,7 +113,7 @@ class Snake(Movable):
         head_angle = self.get_head_angle()
         size = self.rect.width
         
-        head = gui.get_head_surface(size, self.color, head_angle)
+        head = gui.get_head_surface(size, self._color, head_angle)
         pygame.Surface.blit(screen, head, (head_x, head_y))
 
         for i in range(self.tail_lenght):
@@ -121,7 +123,7 @@ class Snake(Movable):
                 prev = self.tail[1]
                 delta = self.get_head_advancement()
                 angle = self.get_angle(t, prev)
-                end_tail = gui.get_end_tail_surface(size, self.color, angle, delta, self.speed)
+                end_tail = gui.get_end_tail_surface(size, self._color, angle, delta, self.speed)
                 
                 if angle == 90 or angle == 180:
                     pygame.Surface.blit(screen, end_tail, (x, y))
@@ -133,7 +135,7 @@ class Snake(Movable):
                     pygame.Surface.blit(screen, end_tail, (x, y - offset))
                 
             elif i == self.tail_lenght - 1:
-                neck = gui.get_neck_surface(size, x, y, self.rect, self.color, head_angle)
+                neck = gui.get_neck_surface(size, x, y, self.rect, self._color, head_angle)
                 pygame.Surface.blit(screen, neck, (x, y))
             else:
                 t_before = self.tail[i-1]
@@ -143,14 +145,14 @@ class Snake(Movable):
                 margin = floor(0.1*size)
 
                 if t_before[0] == t[0] == t_after[0]:
-                    pygame.draw.rect(screen, self.color, (x + margin, y, snake_width, size))
+                    pygame.draw.rect(screen, self._color, (x + margin, y, snake_width, size))
                 elif t_before[1] == t[1] == t_after[1]:
-                    pygame.draw.rect(screen, self.color, (x, y + margin, size, snake_width))
+                    pygame.draw.rect(screen, self._color, (x, y + margin, size, snake_width))
                 else:
                     orientation = self.get_corner_orientation(t_before, self.map.get_case(x, y), t_after)
                     # Transforms -1 into 0 and 1 into 1
                     corner_pos = tuple(map(lambda x: (x+1)//2, orientation))
-                    corner = gui.get_corner_surface(size, self.color, corner_pos)
+                    corner = gui.get_corner_surface(size, self._color, corner_pos)
                     pygame.Surface.blit(screen, corner, (x, y))
 
     def down(self):
