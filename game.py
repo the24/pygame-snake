@@ -189,3 +189,7 @@ class Apple(Object):
         x, y = self.map.get_pos(x, y).topleft
         rect = pygame.Rect(x, y, self.size, self.size)
         self.rect = rect
+    
+    def draw(self, screen: pygame.Surface):
+        apple = gui.get_apple_surface(self.size)
+        pygame.Surface.blit(screen, apple, (self.rect.x, self.rect.y))

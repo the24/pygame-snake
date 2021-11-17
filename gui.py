@@ -201,6 +201,13 @@ def init_font(font: str, size: int):
     global _GameFont
     _GameFont = pygame.font.SysFont(font, size)
 
+def draw_ellipse_angle(surface, color, rect, angle, width=0):
+    target_rect = pygame.Rect(rect)
+    shape_surf = pygame.Surface(target_rect.size, pygame.SRCALPHA)
+    pygame.draw.ellipse(shape_surf, color, (0, 0, *target_rect.size), width)
+    rotated_surf = pygame.transform.rotate(shape_surf, angle)
+    surface.blit(rotated_surf, rotated_surf.get_rect(center = target_rect.center))
+
 def get_head_surface(size: int, main_color: _ColorValue, angle: int) -> pygame.Surface:
     draw_surface = pygame.Surface((size, size)).convert_alpha()
     draw_surface.fill((0, 0, 0, 0))
@@ -298,4 +305,21 @@ def get_end_tail_surface(size, main_color: _ColorValue, angle: int, delta: int, 
     elif angle == 270:
         draw_surface = pygame.transform.flip(draw_surface, True, False)
     
+    return draw_surface
+
+def get_apple_surface(size) -> pygame.Surface:
+    draw_surface = pygame.Surface((size, size)).convert_alpha()
+    transparent = (0, 0, 0, 0)
+    draw_surface.fill(transparent)
+
+    half_size = size/2
+    r = floor(half_size * 0.85)
+    offset = ceil(half_size * 0.15)
+
+    draw_ellipse_angle(draw_surface, (22, 165, 11), (half_size, 0, offset*4, offset*2), 20)
+
+    pygame.draw.rect(draw_surface, (165, 42, 42), (half_size - 1, 0, 3, offset*2))
+
+    pygame.draw.circle(draw_surface, (240, 0, 0), (half_size, half_size + offset), r)
+
     return draw_surface
