@@ -80,6 +80,29 @@ class Label:
         y = self.rect.centery - text.get_size()[1]/2
         screen.blit(text, (x, y))
 
+
+class ImagedLabel(Label):
+
+    def __init__(self, text: str, surface: pygame.Surface, color: _ColorValue, rect: pygame.Rect, margin: int = 0) -> None:
+        self.surface = surface
+        text_rect = rect.copy()
+        text_rect.x += surface.get_width()
+        super().__init__(text, color, text_rect)
+        self.rect = rect
+        self.margin = margin
+    
+    def draw(self, screen: pygame.Surface):
+        text = _GameFont.render(self.text, True, self.color)
+
+        x = self.rect.x
+        y = self.rect.centery - text.get_size()[1]/2
+        screen.blit(self.surface, (x, y))
+
+        x = self.rect.x + self.surface.get_width() + self.margin
+        y = self.rect.centery - text.get_size()[1]/2
+        screen.blit(text, (x, y))
+
+
 @dataclass
 class Tile:
     """
@@ -103,7 +126,8 @@ class Board(Menu):
 
         self.map = Map(10, 9, x + border_size, y + border_size * 2)
         label_rect = pygame.Rect(x + border_size, y, x + border_size + 50, y + border_size * 2)
-        self.label = Label("0", (255, 255, 255), label_rect)
+        apple = get_apple_surface(label_rect.height / 2)
+        self.label = ImagedLabel("0", apple, (255, 255, 255), label_rect, 5)
 
         super().__init__(self.map.width + (2 * border_size), self.map.height + (3 * border_size), x, y)
 
