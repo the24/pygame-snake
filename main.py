@@ -15,7 +15,7 @@ clock = pygame.time.Clock()
 class Game:
 
     def __init__(self) -> None:
-        gui.init_font("Roboto", 36)
+        gui.init_font("Roboto", 32)
 
         self.board = Board()
         self.board.center(screen)

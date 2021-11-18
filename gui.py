@@ -180,7 +180,7 @@ class Map(Menu):
         y = self.y + y * self.tile_size
         return pygame.Rect(x, y, self.tile_size, self.tile_size)
 
-    def get_case(self, x: int, y: int) -> Union[Tuple[int, int], int]:
+    def get_case(self, x: int, y: int) -> Tuple[int, int]:
         """
         Return the coordinates of a tile at position (x; y) on the screen
         """
@@ -192,7 +192,7 @@ class Map(Menu):
         if 0 <= x < width and 0 <= y < height:
             return int(x), int(y)
         else:
-            return -1
+            raise Exception("There's no tile at this position " + str((x, y)))
 
     def draw(self, screen: pygame.Surface):
         """
