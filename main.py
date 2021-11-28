@@ -2,65 +2,69 @@ import pygame
 from pygame.locals import *
 
 import gui
-from game import Apple, Snake
-from gui import Board
+from gui.board import Board
+from map import Map
+from object import Object
 
-pygame.init()
-
-size = width, height = 720, 480
-
-screen = pygame.display.set_mode(size)
-clock = pygame.time.Clock()
 
 class Game:
 
     def __init__(self) -> None:
-        gui.init_font("Roboto", 32)
+        self.playing = False
+        tile_size = 36
 
+        self.obj = Object((2, 0), gui.get_apple_surface(36))
         self.board = Board()
         self.board.center(screen)
-        self.started = False
 
-        self.snake = Snake(self.board.map)
-        self.apple = Apple(self.board.map)
-        self.board.map._objects.append(self.snake)
-        self.board.map._objects.append(self.apple)
-        
+        self.game_map = Map((10, 9), tile_size, self.board.map_pos)
 
     def start(self):
-        self.started = True
+        self.playing = True
     
     def stop(self):
-        self.started = False
+        self.playing = False
 
     def update(self):
-        if self.started:
-            self.board.draw(screen, self.snake.tail_lenght)
+        if not self.playing:
+            return
         
-        if self.snake.rect.collidepoint(self.apple.rect.center):
-            self.snake.eat()
-            self.apple.gen_new_apple(self.snake)
-        
-        self.snake.update()
+        screen.fill((0, 0, 0))
 
+        self.board.draw(screen)
+        self.game_map.handle_anim()
+        pos, surf = self.game_map.get_ui_obj(self.obj)
+        screen.blit(surf, pos)
 
-
-lauched = True
-game = Game()
-
-while lauched:
+        pygame.display.flip()
     
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: lauched = False
-
-        keys = pygame.key.get_pressed()
+    def handle_keys(self, keys):
         if keys[K_SPACE]: game.start()
-        if keys[K_UP] and not game.snake.dir == [0, 1]: game.snake.up()
-        if keys[K_DOWN] and not game.snake.dir == [0, -1]: game.snake.down()
-        if keys[K_RIGHT] and not game.snake.dir == [-1, 0]: game.snake.right()
-        if keys[K_LEFT] and not game.snake.dir == [1, 0]: game.snake.left()
+        if keys[K_a]: self.game_map.obj_rotate(self.obj, 360, 2*60)
+        # if keys[K_UP] and not game.snake.dir == [0, 1]: game.snake.up()
+        # if keys[K_DOWN] and not game.snake.dir == [0, -1]: game.snake.down()
+        # if keys[K_RIGHT] and not game.snake.dir == [-1, 0]: game.snake.right()
+        # if keys[K_LEFT] and not game.snake.dir == [1, 0]: game.snake.left()
+
+
+if __name__ == "__main__":
+    pygame.init()
+
+    size = width, height = 720, 480
+
+    screen = pygame.display.set_mode(size)
+    clock = pygame.time.Clock()
     
-    screen.fill((0, 0, 0))
-    game.update()
-    pygame.display.flip()
-    clock.tick(60)
+    lauched = True
+    game = Game()
+
+    while lauched:
+    
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: lauched = False
+
+            keys = pygame.key.get_pressed()
+            game.handle_keys(keys)
+        
+        clock.tick(60)
+        game.update()
