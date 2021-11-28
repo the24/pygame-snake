@@ -35,13 +35,9 @@ class RotateAnim(Anim):
         self.original_surface = obj_ptr[0]._surface.copy()
     
     def anim(self) -> None:
-        # TODO: Handle zoom distortion
         super().anim()
         
         angle = (self.angle / self.duration) * self.frame_passed
 
-        width = self.obj_ptr[0]._surface.get_width()
-        height = self.obj_ptr[0]._surface.get_height()
-
         rotated_surf = pygame.transform.rotate(self.original_surface, angle)
-        self.obj_ptr[0]._surface = pygame.transform.scale(rotated_surf, (width, height))
+        self.obj_ptr[0]._surface = rotated_surf

@@ -25,8 +25,10 @@ class Map:
         self.anim_list: List[Anim] = []
     
     def get_ui_obj(self, obj: Object) -> Tuple[_IntVec2D, Surface]:
-        x = obj.pos[0] * self.tile_size + self.rect.x
-        y = obj.pos[1] * self.tile_size + self.rect.y
+        x =  obj.pos[0] * self.tile_size + self.rect.x
+        x += round((self.tile_size - obj._surface.get_width()) / 2)
+        y =  obj.pos[1] * self.tile_size + self.rect.y
+        y += round((self.tile_size - obj._surface.get_height()) / 2)
 
         return ((x, y), obj._surface)
 
