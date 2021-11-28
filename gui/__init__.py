@@ -1,7 +1,8 @@
 from math import ceil, floor
-from typing import Tuple
+from typing import List, Tuple
 
 import pygame
+from object import Object
 from pygame import Rect, Surface
 
 import gui.colors
@@ -23,6 +24,16 @@ class Menu:
         self.rect.x = x
         self.rect.y = y
 
+class ScreenObj:
+
+    def __init__(self,
+                 surface: Surface,
+                 screen_pos: _IntVec2D,
+                 obj_ptr: int) -> None:
+        
+        self.surface: Surface       = surface
+        self.screen_pos: _IntVec2D  = screen_pos
+        self.obj_ptr: List[Object]  = obj_ptr
 
 def draw_ellipse_angle(surface: Surface, color: _ColorValue, rect, angle, width=0):
     target_rect = Rect(rect)

@@ -18,6 +18,7 @@ class Game:
         self.board.center(screen)
 
         self.game_map = Map((10, 9), tile_size, self.board.map_pos)
+        self.game_map.add_object(self.obj)
 
     def start(self):
         self.playing = True
@@ -33,14 +34,13 @@ class Game:
 
         self.board.draw(screen)
         self.game_map.handle_anim()
-        pos, surf = self.game_map.get_ui_obj(self.obj)
-        screen.blit(surf, pos)
+        self.game_map.draw(screen)
 
         pygame.display.flip()
     
     def handle_keys(self, keys):
         if keys[K_SPACE]: game.start()
-        if keys[K_a]: self.game_map.obj_rotate(self.obj, 360, 2*60)
+        if keys[K_a]: self.game_map.obj_zoom(self.obj, 20, 2.0)
         # if keys[K_UP] and not game.snake.dir == [0, 1]: game.snake.up()
         # if keys[K_DOWN] and not game.snake.dir == [0, -1]: game.snake.down()
         # if keys[K_RIGHT] and not game.snake.dir == [-1, 0]: game.snake.right()
