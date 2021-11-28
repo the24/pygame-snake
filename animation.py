@@ -15,9 +15,17 @@ class Anim:
         self.loop = loop
         self.ended = False
     
-    @abstractmethod
     def anim(self) -> None:
-        pass
+        if self.ended:
+            return
+        
+        self.frame_passed += 1
+
+        if self.frame_passed == self.duration:
+            if self.loop:
+                self.frame_passed = 0
+            else:
+                self.ended = True
 
 class RotateAnim(Anim):
 
@@ -28,11 +36,7 @@ class RotateAnim(Anim):
     
     def anim(self) -> None:
         # TODO: Handle zoom distortion
-        if self.ended:
-            return
-        
-        if self.frame_passed >= self.duration and not self.loop:
-            self.ended = True
+        super().anim()
         
         angle = (self.angle / self.duration) * self.frame_passed
 
@@ -41,5 +45,3 @@ class RotateAnim(Anim):
 
         rotated_surf = pygame.transform.rotate(self.original_surface, angle)
         self.obj_ptr[0]._surface = pygame.transform.scale(rotated_surf, (width, height))
-
-        self.frame_passed += 1

@@ -36,9 +36,9 @@ class Map:
         for anim in self.anim_list:
             anim.anim()
 
-    def obj_rotate(self, obj, angle, duration):
+    def obj_rotate(self, obj, angle, duration, loop = False):
         for anim in self.anim_list:
             if obj is anim.obj_ptr[0] and isinstance(anim, RotateAnim):
                 return
         
-        self.anim_list.append(RotateAnim([obj], duration, angle))
+        self.anim_list.append(RotateAnim([obj], duration, angle, loop))
