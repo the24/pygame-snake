@@ -3,7 +3,7 @@ from typing import List, Tuple
 import pygame
 from pygame import Rect, Surface
 
-from animation import Anim, RotateAnim
+from animation import Anim, RotateAnim, ZoomAnim
 from object import Object
 
 _IntVec2D = Tuple[int, int]
@@ -38,9 +38,16 @@ class Map:
         for anim in self.anim_list:
             anim.anim()
 
-    def obj_rotate(self, obj, angle, duration, loop = False):
+    def obj_rotate(self, obj, duration, angle, loop = False):
         for anim in self.anim_list:
             if obj is anim.obj_ptr[0] and isinstance(anim, RotateAnim):
                 return
         
         self.anim_list.append(RotateAnim([obj], duration, angle, loop))
+
+    def obj_zoom(self, obj, duration, zoom, loop = False):
+        for anim in self.anim_list:
+            if obj is anim.obj_ptr[0] and isinstance(anim, ZoomAnim):
+                return
+        
+        self.anim_list.append(ZoomAnim([obj], duration, zoom, loop))

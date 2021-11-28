@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from math import ceil
 from typing import List
 
 import pygame
@@ -29,15 +30,45 @@ class Anim:
 
 class RotateAnim(Anim):
 
-    def __init__(self, obj_ptr: List[Object], duration, angle, loop=False) -> None:
+    def __init__(self,
+                 obj_ptr:   List[Object],
+                 duration:  int,
+                 angle:     int,
+                 loop:      bool = False) -> None:
+        
         super().__init__(obj_ptr, duration, loop=loop)
         self.angle = angle
         self.original_surface = obj_ptr[0]._surface.copy()
     
     def anim(self) -> None:
         super().anim()
+        obj = self.obj_ptr[0]
         
         angle = (self.angle / self.duration) * self.frame_passed
 
         rotated_surf = pygame.transform.rotate(self.original_surface, angle)
-        self.obj_ptr[0]._surface = rotated_surf
+        obj._surface = rotated_surf
+
+class ZoomAnim(Anim):
+
+    def __init__(self,
+                 obj_ptr:   List[Object],
+                 duration:  int,
+                 zoom:      float,
+                 loop:      bool = False) -> None:
+        
+        super().__init__(obj_ptr, duration, loop=loop)
+        self.zoom = zoom
+        self.original_surface = obj_ptr[0]._surface.copy()
+    
+    def anim(self) -> None:
+        super().anim()
+        obj = self.obj_ptr[0]
+
+        zoom = ((self.zoom - 1) / self.duration) * self.frame_passed + 1
+
+        new_width  = self.original_surface.get_width() * zoom
+        new_height = self.original_surface.get_height() * zoom
+        obj._surface = pygame.transform.scale(self.original_surface, (new_width, new_height))
+
+
